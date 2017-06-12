@@ -5,7 +5,7 @@ from bpy.props import StringProperty
 bl_info = {
     "name": "create primitive matrix",
     "author": "Drunkar",
-    "version": (0, 1),
+    "version": (0, 2),
     "blender": (2, 7, 8),
     "location": "3D View, Ctrl + Alt + M",
     "description": "Create and put primitives in matrix.",
@@ -32,6 +32,7 @@ class SeectionSplitter(bpy.types.Operator):
         y = context.scene.primitive_matrix_location[1]
         dx = context.scene.primitive_matrix_distances[0]
         dy = context.scene.primitive_matrix_distances[1]
+        count = 0
         for i in range(context.scene.primitive_matrix_num_objects[0]):
             for j in range(context.scene.primitive_matrix_num_objects[1]):
                 if context.scene.primitive_matrix_primitive_type == "cube":
@@ -40,6 +41,11 @@ class SeectionSplitter(bpy.types.Operator):
                 elif context.scene.primitive_matrix_primitive_type == "ico_sphere":
                     bpy.ops.mesh.primitive_ico_sphere_add(
                         subdivisions=2, size=0.2, location=(x + i * dx, y + j * dy, 0.0))
+                # set name
+                bpy.context.object.name = context.scene.primitive_matrix_name_prefix + \
+                    ("{0:0" + str(context.scene.primitive_matrix_name_zero_padding) + \
+                    "d}").format(count)
+                count += 1
         return {"FINISHED"}
 
     def draw(self, context):
@@ -48,6 +54,8 @@ class SeectionSplitter(bpy.types.Operator):
         col.prop(context.scene, "primitive_matrix_location")
         col.prop(context.scene, "primitive_matrix_num_objects")
         col.prop(context.scene, "primitive_matrix_distances")
+        col.prop(context.scene, "primitive_matrix_name_prefix")
+        col.prop(context.scene, "primitive_matrix_name_zero_padding")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
@@ -104,6 +112,17 @@ def register():
     bpy.types.Scene.primitive_matrix_distances\
         = bpy.props.FloatVectorProperty(name="distance", size=2, subtype="XYZ",
                                         default=(2.0, 2.0), description="Distance between objects")
+    bpy.types.Scene.primitive_matrix_name_prefix\
+        = bpy.props.StringProperty(
+            name="name_prefix",
+            description="name before number",
+            default="OBJ_")
+    bpy.types.Scene.primitive_matrix_name_zero_padding\
+        = bpy.props.IntProperty(
+            name="name_zero_padding_num",
+            description="number of zero padding of the object name",
+            min=0,
+            default=3)
     register_shortcut()
 
 
@@ -113,6 +132,8 @@ def unregister():
     del bpy.types.Scene.primitive_matrix_location
     del bpy.types.Scene.primitive_matrix_num_objects
     del bpy.types.Scene.primitive_matrix_distances
+    del bpy.types.Scene.primitive_matrix_name_prefix
+    del bpy.types.Scene.primitive_matrix_name_zero_padding
 
 
 if __name__ == "__main__":
