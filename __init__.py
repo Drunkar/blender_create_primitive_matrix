@@ -5,7 +5,7 @@ from bpy.props import StringProperty
 bl_info = {
     "name": "create primitive matrix",
     "author": "Drunkar",
-    "version": (0, 2),
+    "version": (0, 3),
     "blender": (2, 7, 8),
     "location": "3D View, Ctrl + Alt + M",
     "description": "Create and put primitives in matrix.",
@@ -32,7 +32,7 @@ class SeectionSplitter(bpy.types.Operator):
         y = context.scene.primitive_matrix_location[1]
         dx = context.scene.primitive_matrix_distances[0]
         dy = context.scene.primitive_matrix_distances[1]
-        count = 0
+        count = 1
         for i in range(context.scene.primitive_matrix_num_objects[0]):
             for j in range(context.scene.primitive_matrix_num_objects[1]):
                 if context.scene.primitive_matrix_primitive_type == "cube":
