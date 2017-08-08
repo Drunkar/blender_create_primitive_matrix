@@ -5,9 +5,9 @@ from bpy.props import StringProperty
 bl_info = {
     "name": "create primitive matrix",
     "author": "Drunkar",
-    "version": (0, 3),
+    "version": (0, 4),
     "blender": (2, 7, 8),
-    "location": "3D View, Ctrl + Alt + M",
+    "location": "View3D > Add > Mesh > Primitive in matrix, Ctrl + Alt + M",
     "description": "Create and put primitives in matrix.",
     "warning": "",
     "wiki_url": "",
@@ -19,10 +19,10 @@ bl_info = {
 addon_keymaps = []
 
 
-class SeectionSplitter(bpy.types.Operator):
+class CreatePrimitiveMatrix(bpy.types.Operator):
 
     bl_idname = "object.create_primitive_matrix"
-    bl_label = "create primitive matrix"
+    bl_label = "create primitive in matrix"
     bl_description = "Create and put primitives in matrix."
     bl_options = {"REGISTER", "UNDO"}
 
@@ -62,7 +62,7 @@ class SeectionSplitter(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(SeectionSplitter.bl_idname)
+    self.layout.operator(CreatePrimitiveMatrix.bl_idname, text="Primitive in Matrix")
 
 
 def register_shortcut():
@@ -73,7 +73,7 @@ def register_shortcut():
         km = kc.keymaps.new(name="3D View", space_type="VIEW_3D")
         # key
         kmi = km.keymap_items.new(
-            idname=SeectionSplitter.bl_idname,
+            idname=CreatePrimitiveMatrix.bl_idname,
             type="M",
             value="PRESS",
             shift=False,
@@ -94,6 +94,7 @@ def unregister_shortcut():
 def register():
     unregister_shortcut()
     bpy.utils.register_module(__name__)
+    bpy.types.INFO_MT_mesh_add.append(menu_func)
     bpy.types.Scene.primitive_matrix_primitive_type\
         = bpy.props.EnumProperty(name="objType",
                                  description="Object Type",
@@ -128,6 +129,7 @@ def register():
 
 def unregister():
     bpy.utils.unregister_module(__name__)
+    bpy.types.INFO_MT_mesh_add.remove(menu_func)
     del bpy.types.Scene.primitive_matrix_primitive_type
     del bpy.types.Scene.primitive_matrix_location
     del bpy.types.Scene.primitive_matrix_num_objects
