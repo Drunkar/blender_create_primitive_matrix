@@ -6,7 +6,7 @@ bl_info = {
     "name": "create primitive matrix",
     "author": "Drunkar",
     "version": (0, 4),
-    "blender": (2, 7, 8),
+    "blender": (2, 80, 0),
     "location": "View3D > Add > Mesh > Primitive in matrix, Ctrl + Alt + M",
     "description": "Create and put primitives in matrix.",
     "warning": "",
@@ -40,7 +40,7 @@ class CreatePrimitiveMatrix(bpy.types.Operator):
                         location=(x + i * dx, y + j * dy, 0.0))
                 elif context.scene.primitive_matrix_primitive_type == "ico_sphere":
                     bpy.ops.mesh.primitive_ico_sphere_add(
-                        subdivisions=2, size=0.2, location=(x + i * dx, y + j * dy, 0.0))
+                        subdivisions=2, radius=0.6, location=(x + i * dx, y + j * dy, 0.0))
                 # set name
                 bpy.context.object.name = context.scene.primitive_matrix_name_prefix + \
                     ("{0:0" + str(context.scene.primitive_matrix_name_zero_padding) + \
@@ -91,10 +91,16 @@ def unregister_shortcut():
     addon_keymaps.clear()
 
 
+classes = (
+    CreatePrimitiveMatrix,
+)
+
+
 def register():
     unregister_shortcut()
-    bpy.utils.register_module(__name__)
-    bpy.types.INFO_MT_mesh_add.append(menu_func)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+    bpy.types.VIEW3D_MT_mesh_add.append(menu_func)
     bpy.types.Scene.primitive_matrix_primitive_type\
         = bpy.props.EnumProperty(name="objType",
                                  description="Object Type",
@@ -128,8 +134,9 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    bpy.types.INFO_MT_mesh_add.remove(menu_func)
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
+    bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
     del bpy.types.Scene.primitive_matrix_primitive_type
     del bpy.types.Scene.primitive_matrix_location
     del bpy.types.Scene.primitive_matrix_num_objects
