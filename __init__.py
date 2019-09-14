@@ -100,7 +100,10 @@ def register():
     unregister_shortcut()
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.VIEW3D_MT_mesh_add.append(menu_func)
+    if bpy.app.version < (2, 80, 0):
+        bpy.types.INFO_MT_mesh_add.append(menu_func)
+    else:
+        bpy.types.VIEW3D_MT_mesh_add.append(menu_func)
     bpy.types.Scene.primitive_matrix_primitive_type\
         = bpy.props.EnumProperty(name="objType",
                                  description="Object Type",
@@ -136,7 +139,10 @@ def register():
 def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-    bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
+    if bpy.app.version < (2, 80, 0):
+        bpy.types.INFO_MT_mesh_add.remove(menu_func)
+    else:
+        bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
     del bpy.types.Scene.primitive_matrix_primitive_type
     del bpy.types.Scene.primitive_matrix_location
     del bpy.types.Scene.primitive_matrix_num_objects
