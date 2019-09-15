@@ -39,8 +39,12 @@ class CreatePrimitiveMatrix(bpy.types.Operator):
                     bpy.ops.mesh.primitive_cube_add(
                         location=(x + i * dx, y + j * dy, 0.0))
                 elif context.scene.primitive_matrix_primitive_type == "ico_sphere":
-                    bpy.ops.mesh.primitive_ico_sphere_add(
-                        subdivisions=2, radius=0.6, location=(x + i * dx, y + j * dy, 0.0))
+                    if bpy.app.version < (2, 80, 0):
+                        bpy.ops.mesh.primitive_ico_sphere_add(
+                            subdivisions=2, size=0.2, location=(x + i * dx, y + j * dy, 0.0))
+                    else:
+                        bpy.ops.mesh.primitive_ico_sphere_add(
+                            subdivisions=2, radius=0.6, location=(x + i * dx, y + j * dy, 0.0))
                 # set name
                 bpy.context.object.name = context.scene.primitive_matrix_name_prefix + \
                     ("{0:0" + str(context.scene.primitive_matrix_name_zero_padding) + \
